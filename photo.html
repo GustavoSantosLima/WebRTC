@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>WebRTC</title>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div class="container">
+            <video id="video" class="img-thumbnail" autoplay></video>
+            <button type="button" class="btn btn-primary">Clique para tirar foto!</button>
+            <select id="filter" class="form-control">
+                <option value="none">None</option>
+                <option value="sepia">Sepia</option>
+                <option value="gray">Gray</option>
+                <option value="blur">Blur</option>
+            </select>
+            <div id="box-canvas">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <script>
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+            var video = document.getElementById("video");
+            var canvas = document.getElementById("canvas");
+            var select = document.getElementById("filter");
+            var button = document.querySelector("button");
+
+            canvas.width = 480;
+            canvas.height = 360;
+
+            filter.onchange = function () {
+                console.log(select.value);
+                video.className = select.value;
+                canvas.className = select.value;
+            };
+
+            button.onclick = function () {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            };
+
+            if(navigator.getUserMedia){
+                navigator.mediaDevices.getUserMedia({ video: true}).then(function (stream) {
+                    video.srcObject = stream;
+                }).catch(function (err) {
+                    if(err.name == 'ConstraintNotSatisfiedError'){
+                        console.log('Invalid Options!');
+                    }
+
+                    if(err.name == 'PermissionDeniedError'){
+                        console.log('Permission Danied!');
+                        alert('Permission Danied!');
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

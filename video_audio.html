@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>WebRTC</title>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div class="container">
+            <video id="localstreamer" class="img-thumbnail" controls autoplay></video>
+        </div>
+
+        <script>
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+            var video = document.getElementById("localstreamer");
+
+            if(navigator.getUserMedia){
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true}).then(function (stream) {
+                    var track = stream.getVideoTracks();
+                    console.log(track);
+                    video.srcObject = stream;
+                }).catch(function (err) {
+                    if(err.name == 'ConstraintNotSatisfiedError'){
+                        console.log('Invalid Options!');
+                    }
+
+                    if(err.name == 'PermissionDeniedError'){
+                        console.log('Permission Danied!');
+                        alert('Permission Danied!');
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

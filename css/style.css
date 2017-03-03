@@ -1,0 +1,31 @@
+html, body{
+    background-color: #ccc;
+}
+
+#localstreamer {
+    margin: 50px 7%;
+    border: 1px solid #000;
+    box-shadow: 0 0 100px #666;
+}
+
+#video {
+    margin-top: 50px;
+    border: 1px solid #000;
+    box-shadow: 0 0 100px #666;
+}
+
+.none {
+    filter: none;
+}
+
+.sepia {
+    filter: sepia(1);
+}
+
+.gray {
+    filter: grayscale(1);
+}
+
+.blur {
+    filter: blur(5px);
+}

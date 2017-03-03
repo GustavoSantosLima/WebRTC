@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>WebRTC</title>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div class="container">
+            <audio id="localAudio" controls autoplay></audio>
+        </div>
+
+        <script>
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+            var audio = document.getElementById("localAudio");
+
+            if(navigator.getUserMedia){
+                navigator.mediaDevices.getUserMedia({ audio: true}).then(function (audioStream) {
+                    var track = audioStream.getAudioTracks();
+                    console.log(track);
+                    audio.srcObject = audioStream;
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            }
+        </script>
+    </body>
+</html>

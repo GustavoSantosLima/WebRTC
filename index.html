@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>WebRTC</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <header>
+                <div class="row text-center">
+                    <div class="well well-sm col-md-4 col-md-offset-4"><b>ID:</b> <span id="id"></span></div>
+                </div>
+            </header>
+
+            <main class="login">
+                <div class="row" style="margin: 10px 0">
+                    <video id="local" class="col-md-6" src="" autoplay controls></video>
+                    <video id="pattern" class="col-md-6" src="" autoplay></video>
+                </div>
+                <div class="row">
+                    <form class="form-inline col-md-4 col-md-offset-4">
+                        <div class="form-group">
+                            <input type="text" name="peer_id" id="peer_id" class="form-control text-center">
+                        </div>
+                        <button type="button" id="call" class="btn btn-primary">Ligar</button>
+                        <button type="button" id="login" class="btn btn-success hidden">Aceitar</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+        <script>
+            (function () {
+                var app = {
+                    peers: []
+                };
+
+                app.checkRTC = function (callback) {
+                    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+                    if(!navigator.getUserMedia){
+                        return callback({ err: 'RTC Failed' }, false);
+                    }
+
+                    navigator.getUserMedia({ audio: true, video:  true }, callback, function (err) {
+                        console.log('CheckRTC => ', err);
+                    })
+                };
+
+                app.onRecieveStream = function (stream, name) {
+                    var video = $('#' + name)[0];
+                    video.src = window.URL.createObjectURL(stream);
+                    window.peer_stream = stream;
+                };
+
+                app.newPeer = function () {
+                    $('#id').text(app.peer.id);
+                };
+
+                app.login = function () {
+                    var peerID = $('#peer_id').val();
+                    if(peerID){
+                        app.peers.push(peerID);
+                        con = app.peer.connect(peerID);
+                    }
+                };
+
+                app.peerConnection = function (connection) {
+                    app.peer.peer_id = connection.peer;
+                    app.peer.connection = connection;
+                    console.log('A New Connection!');
+                    $('#call').addClass('hidden');
+                    $('#login').removeClass('hidden');
+                    $('#peer_id').val(connection.peer);
+                };
+
+                app.call = function () {
+                    app.login();
+                    var call = app.peer.call(app.peer.peer_id, window.localStream);
+                    call.on('stream', function (stream) {
+                        window.peer_stream = stream;
+                        app.onRecieveStream(stream, 'pattern');
+                    });
+                };
+
+                app.onReceiveCall = function (call) {
+                    call.answer(window.localStream);
+                    call.on('stream', function (stream) {
+                        window.peer_stream = stream;
+                        app.onRecieveStream(stream, 'pattern');
+                    });
+                };
+
+                app.peerCall = function (call) {
+                    return app.onReceiveCall(call);
+                };
+
+                app.init = function () {
+                    app.peer = new Peer({ key: 'n1qy6vxz0y4rhpvi', debug: '3' });
+
+                    app.peer.on('open', app.newPeer);
+                    app.peer.on('connection', app.peerConnection);
+                    app.peer.on('call', app.peerCall);
+
+                    app.checkRTC(function (stream) {
+                        window.localStream = stream;
+                        app.onRecieveStream(stream, 'local');
+                    });
+                    
+                    $('#login').on('click', app.call);
+                    $('#call').on('click', app.call);
+                };
+
+                app.init();
+            })();
+        </script>
+    </body>
+</html>
